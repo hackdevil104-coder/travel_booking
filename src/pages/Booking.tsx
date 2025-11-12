@@ -37,13 +37,42 @@ const Booking = () => {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Booking Confirmed!", {
-      description: `Your trip to ${destination.name} has been confirmed. We'll send you a confirmation email shortly.`,
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  // Validation check before sending
+  const start = new Date(formData.startDate);
+  const end = new Date(formData.endDate);
+  if (start >= end) {
+    toast.error("Invalid Dates", {
+      description: "Start date must be earlier than end date.",
     });
-    setTimeout(() => navigate("/"), 2000);
-  };
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:7070/api/booking", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      toast.success("Booking Confirmed!", {
+        description: `Your trip to ${destination.name} has been confirmed.`,
+      });
+      setTimeout(() => navigate("/"), 2000);
+    } else {
+      toast.error("Booking failed");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Network error");
+  }
+};
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -151,6 +180,7 @@ const Booking = () => {
                       name="startDate"
                       type="date"
                       value={formData.startDate}
+                       min={new Date().toISOString().split("T")[0]} 
                       onChange={handleChange}
                       required
                     />
@@ -166,6 +196,7 @@ const Booking = () => {
                       name="endDate"
                       type="date"
                       value={formData.endDate}
+                      min={formData.startDate || new Date().toISOString().split("T")[0]}
                       onChange={handleChange}
                       required
                     />

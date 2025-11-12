@@ -15,13 +15,36 @@ const Contact = () => {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Message Sent!", {
-      description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:7070/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
-    setFormData({ name: "", email: "", subject: "", message: "" });
-  };
+
+    if (response.ok) {
+      toast.success("Message Sent!", {
+        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+      });
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } else {
+      toast.error("Message sending failed", {
+        description: "Server error — please try again.",
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    toast.error("Network Error", {
+      description: "Could not connect to server.",
+    });
+  }
+};
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

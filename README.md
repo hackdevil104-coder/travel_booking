@@ -28,9 +28,5 @@ This app helps users explore destinations, compare packages, and book trips with
 
 ---
 
-## 🚀 Setup & Run Locally
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/hackdevil104-coder/travel-booking-app.git
-   
+
